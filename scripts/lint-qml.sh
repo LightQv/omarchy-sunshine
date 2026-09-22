@@ -6,12 +6,14 @@ imports=${OMARCHY_SHELL_PATH:-/usr/share/omarchy/shell}
 qmllint=${QMLLINT:-}
 
 if [[ -z "$qmllint" ]]; then
-  if command -v qmllint >/dev/null 2>&1; then
+  if command -v pyside6-qmllint >/dev/null 2>&1; then
+    qmllint=$(command -v pyside6-qmllint)
+  elif command -v qmllint >/dev/null 2>&1; then
     qmllint=$(command -v qmllint)
   elif [[ -x /usr/lib/qt6/bin/qmllint ]]; then
     qmllint=/usr/lib/qt6/bin/qmllint
   else
-    printf '%s\n' "qmllint is required" >&2
+    printf '%s\n' "Qt 6 qmllint is required (Arch: qt6-declarative; other systems: PySide6-Essentials)." >&2
     exit 127
   fi
 fi
