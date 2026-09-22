@@ -2,7 +2,9 @@
 
 A native Omarchy bar widget for controlling Sunshine and opening its Web UI.
 
-![Omarchy Sunshine preview](preview.png)
+## Preview
+
+![Omarchy Sunshine plugin showing the bar widget and runtime controls](preview.png)
 
 ## Features
 
@@ -68,8 +70,21 @@ shell or Sunshine upgrades.
 
 Sunshine's native tray icon cannot be disabled separately from Sunshine's
 notifications. The plugin therefore does not modify that icon, notification
-behavior, or any Sunshine configuration. Use Sunshine's own controls if its
-upstream behavior changes in the future.
+behavior, Sunshine configuration, or Omarchy tray preferences.
+
+To show only the plugin icon while preserving Sunshine notifications:
+
+1. Start Sunshine so its native icon appears.
+2. Right-click Omarchy's tray chevron and open **Tray icons**.
+3. Select **Hide** for Sunshine.
+
+Select **Show** from the same menu to restore the native icon. If Sunshine is
+your only native tray item, restore it before disabling or removing this plugin
+so the tray chevron remains available.
+
+Automatic hiding and restoration, like Omarchy's built-in Dropbox integration,
+requires support from the Omarchy shell and is outside a regular marketplace
+plugin's configuration boundaries.
 
 ## Session Status
 
