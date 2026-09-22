@@ -1,0 +1,52 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: plugin
+          persist-credentials: false
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: basecamp/omarchy
+          ref: 7be59e1f4b7451d352d4673c560168290792590f
+          path: omarchy
+          sparse-checkout: |
+            bin/omarchy-plugin-validate
+            shell/
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Install Qt 6 QML lint
+        run: python -m pip install --disable-pip-version-check --no-cache-dir PySide6-Essentials==6.11.2
+
+      - name: Validate manifest
+        run: ./omarchy/bin/omarchy-plugin-validate ./plugin
+
+      - name: Validate release metadata
+        run: bash ./plugin/scripts/check-release-metadata.sh
+
+      - name: Lint QML
+        env:
+          OMARCHY_SHELL_PATH: ${{ github.workspace }}/omarchy/shell
+        run: bash ./plugin/scripts/lint-qml.sh
+
+      - name: Run model tests
+        run: node --test plugin/tests/*.test.js
+
+      - name: Check shell syntax
+        run: bash -n plugin/scripts/*.sh plugin/tests/helpers/fake-systemctl
+
+      - name: Check whitespace
+        run: git -C plugin diff --check

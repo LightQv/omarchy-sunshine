@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "lightqv.sunshine",
+  "name": "Sunshine",
+  "version": "0.1.0",
+  "description": "Sunshine runtime controls and Web UI access for Omarchy.",
+  "author": "lightqv",
+  "license": "MIT",
+  "kinds": ["bar-widget", "service"],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml",
+    "service": "Service.qml"
+  },
+  "barWidget": {
+    "displayName": "Sunshine",
+    "description": "Sunshine status, power controls, and Web UI access.",
+    "category": "System",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}

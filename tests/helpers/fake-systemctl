@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+: "${FAKE_SYSTEMCTL_ROOT:?FAKE_SYSTEMCTL_ROOT must be set}"
+
+owns_lock=false
+cleanup() {
+  if [[ $owns_lock == true ]]; then
+    rmdir -- "$FAKE_SYSTEMCTL_ROOT/lock" 2>/dev/null || true
+  fi
+}
+trap cleanup EXIT
+
+if mkdir -- "$FAKE_SYSTEMCTL_ROOT/lock" 2>/dev/null; then
+  owns_lock=true
+else
+  : >"$FAKE_SYSTEMCTL_ROOT/concurrent"
+  exit 97
+fi
+
+printf '%s\n' "$*" >>"$FAKE_SYSTEMCTL_ROOT/calls"
+
+if [[ ${1:-} != --user ]]; then
+  printf '%s\n' "expected --user" >&2
+  exit 2
+fi
+shift
+
+case ${1:-} in
+  show)
+    if [[ -e $FAKE_SYSTEMCTL_ROOT/running ]]; then
+      printf '%s\n' 'LoadState=loaded' 'ActiveState=active' 'SubState=running' 'UnitFileState=enabled'
+    else
+      printf '%s\n' 'LoadState=loaded' 'ActiveState=inactive' 'SubState=dead' 'UnitFileState=enabled'
+    fi
+    ;;
+  start)
+    sleep "${FAKE_SYSTEMCTL_START_DELAY:-0.2}"
+    : >"$FAKE_SYSTEMCTL_ROOT/running"
+    ;;
+  stop)
+    rm -f -- "$FAKE_SYSTEMCTL_ROOT/running"
+    ;;
+  disable)
+    printf '%s\n' 'synthetic disable failure' >&2
+    exit 23
+    ;;
+  enable)
+    ;;
+  *)
+    printf 'unexpected fake systemctl command: %s\n' "${1:-}" >&2
+    exit 2
+    ;;
+esac
